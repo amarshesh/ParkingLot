@@ -8,3 +8,4 @@
 .vscode/
 /.github/
 *.log
+/__pycache__/
