@@ -1,6 +1,7 @@
 import uuid
 import time
 from pricingStrategy.pricing_factory import VehiclePricingFactory
+import pricingStrategy.vehicles_pricing  # ensure strategies are registered
 from spot_class import SpotClass
 from ticket_class import Ticket
 class ParkingLot:

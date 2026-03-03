@@ -1,12 +1,12 @@
-from pricingStrategy.vehicles_pricing import LargePricing, MediumPricing, SmallPricing
 class VehiclePricingFactory:
-    @staticmethod
-    def get_pricing_strategy(vehicle_type):
-        if vehicle_type == "small":
-            return SmallPricing()
-        elif vehicle_type == "medium":
-            return MediumPricing()
-        elif vehicle_type == "large":
-            return LargePricing()
-        else:
-            raise ValueError("Unknown vehicle type: " + vehicle_type)
+    _registry = {}
+    @classmethod
+    def register_pricing_strategy(cls, vehicle_size, strategy_cls):
+        cls._registry[vehicle_size] = strategy_cls
+
+    @classmethod
+    def get_pricing_strategy(cls, vehicle_size):
+        strategy_cls = cls._registry.get(vehicle_size)
+        if strategy_cls:
+            return strategy_cls()
+        raise ValueError(f"No pricing strategy registered for vehicle size: {vehicle_size}")
