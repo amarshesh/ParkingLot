@@ -1,8 +1,8 @@
 import uuid
 import time
+from pricingStrategy.pricing_factory import VehiclePricingFactory
 from spot_class import SpotClass
 from ticket_class import Ticket
-from pricingStrategy.vehicles_pricing import SmallPricing, MediumPricing, LargePricing
 class ParkingLot:
     def __init__(self):
         self.spots = []
@@ -17,12 +17,7 @@ class ParkingLot:
                 spot.current_vehicle = vehicle_number
                 ticket_id = str(uuid.uuid4())
                 entry_time = time.time()
-                if vehicle_size == "small":
-                    pricing_strategy = SmallPricing()
-                elif vehicle_size == "medium":
-                    pricing_strategy = MediumPricing()
-                elif vehicle_size == "large":
-                    pricing_strategy = LargePricing()
+                pricing_strategy = VehiclePricingFactory.get_pricing_strategy(vehicle_size)
                 ticket = Ticket(ticket_id, entry_time, spot.spot_id, vehicle_size, pricing_strategy)
                 self.tickets[ticket_id] = ticket    
                 return ticket_id
