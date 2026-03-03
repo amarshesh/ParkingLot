@@ -1,8 +1,8 @@
 import uuid
 import time
+from pricingStrategy.pricing_factory import VehiclePricingFactory
 from spot_class import SpotClass
 from ticket_class import Ticket
-
 class ParkingLot:
     def __init__(self):
         self.spots = []
@@ -17,8 +17,9 @@ class ParkingLot:
                 spot.current_vehicle = vehicle_number
                 ticket_id = str(uuid.uuid4())
                 entry_time = time.time()
-                ticket = Ticket(ticket_id, entry_time, spot.spot_id, vehicle_size)
-                self.tickets[ticket_id] = ticket
+                pricing_strategy = VehiclePricingFactory.get_pricing_strategy(vehicle_size)
+                ticket = Ticket(ticket_id, entry_time, spot.spot_id, vehicle_size, pricing_strategy)
+                self.tickets[ticket_id] = ticket    
                 return ticket_id
         return None
     
