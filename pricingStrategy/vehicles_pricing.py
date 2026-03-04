@@ -16,7 +16,12 @@ class LargePricing(PricingStrategy):
     def calculate_price(self, base_price):
         return base_price * 1.5
 
+class LowPricing(PricingStrategy):
+    def calculate_price(self, base_price):
+        return base_price * 0.5
+    
 # Registering the strategies in the factory
 VehiclePricingFactory.register_pricing_strategy("small", SmallPricing)
 VehiclePricingFactory.register_pricing_strategy("medium", MediumPricing)
 VehiclePricingFactory.register_pricing_strategy("large", LargePricing)
+VehiclePricingFactory.register_pricing_strategy("low", LowPricing)  
