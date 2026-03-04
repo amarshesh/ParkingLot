@@ -1,28 +1,37 @@
 import uuid
 import time
+from parkingStrategy.allocationStrategy import AllocationStrategy
+from parkingStrategy.parking_strategy import BestFitStrategy, NearestExitStrategy
 from pricingStrategy.pricing_factory import VehiclePricingFactory
+import pricingStrategy.vehicles_pricing
 from spot_class import SpotClass
 from ticket_class import Ticket
+from vehicle_class import VehicleClass
 class ParkingLot:
-    def __init__(self):
+    def __init__(self, allocation_strategy=None):
         self.spots = []
         self.tickets = {}
-        self.spots.append(SpotClass("S1", "small"))
-        self.spots.append(SpotClass("S2", "medium"))
-        self.spots.append(SpotClass("S3", "large"))
+        # default strategy
+        self.allocation_strategy = allocation_strategy or BestFitStrategy()
+        self.spots.append(SpotClass("S1", "small", 5))
+        self.spots.append(SpotClass("S2", "medium", 10))
+        self.spots.append(SpotClass("S3", "large", 3))
+        self.spots.append(SpotClass("S4", "low", 2))
 
-    def handle_entry(self, vehicle_number, vehicle_size):
-        for spot in self.spots:
-            if spot.size == vehicle_size and spot.current_vehicle is None:
-                spot.current_vehicle = vehicle_number
-                ticket_id = str(uuid.uuid4())
-                entry_time = time.time()
-                pricing_strategy = VehiclePricingFactory.get_pricing_strategy(vehicle_size)
-                ticket = Ticket(ticket_id, entry_time, spot.spot_id, vehicle_size, pricing_strategy)
-                self.tickets[ticket_id] = ticket    
-                return ticket_id
-        return None
-    
+    def handle_entry(self, vehicle: VehicleClass):
+        strategy = AllocationStrategy.resolve(self, vehicle)
+        spot = strategy.allocate_spot(vehicle.size, self.spots)
+        if spot is None:
+            print("No spot available for vehicle size:", vehicle.size)
+            return None
+        spot.current_vehicle = vehicle.vehicle_number
+        ticket_id = str(uuid.uuid4())
+        entry_time = time.time()
+        pricing_strategy = VehiclePricingFactory.get_pricing_strategy(vehicle.size)
+        ticket = Ticket(ticket_id, entry_time, spot.spot_id, vehicle.size, pricing_strategy)
+        self.tickets[ticket_id] = ticket
+        return ticket_id
+
     def handle_exit(self, ticket_id):
         if ticket_id in self.tickets:
             ticket = self.tickets[ticket_id]
@@ -30,6 +39,7 @@ class ParkingLot:
             ticket.close(end_time, rate_per_hour=10)
             amount = ticket.amount
             spot_id = ticket.spot_assigned
+            print(f"Spot id assigned for ticket {ticket_id} is {spot_id}")
             for spot in self.spots:
                 if spot.spot_id == spot_id:
                     spot.current_vehicle = None
@@ -39,28 +49,27 @@ class ParkingLot:
     
 
 if __name__ == "__main__":
-    parking_lot = ParkingLot()
+    parking_lot = ParkingLot(BestFitStrategy())
 
-    tid1 = parking_lot.handle_entry("KA-01-AB-1234", "small")
+    v1 = VehicleClass("KA-01-AB-1234", "small", False, True, False)
+    tid1 = parking_lot.handle_entry(v1)
     print("Ticket ID:", tid1)
     time.sleep(2)
-    amount1 = parking_lot.handle_exit(tid1)
-    print("Amount for ticket", tid1, "is", amount1)
-    
 
-    tid2 = parking_lot.handle_entry("KA-01-AB-5678", "medium")
+    v2 = VehicleClass("KA-01-AB-5678", "medium", False, True, False)
+    tid2 = parking_lot.handle_entry(v2)
     print("Ticket ID:", tid2)
-    time.sleep(2)   
-    amount2 = parking_lot.handle_exit(tid2)
-    print("Amount for ticket", tid2, "is", amount2)
-    
+    time.sleep(2)
 
-    tid3 = parking_lot.handle_entry("KA-01-AB-9012", "large")
+    v3 = VehicleClass("KA-01-AB-9012", "large", False, True, False)
+    tid3 = parking_lot.handle_entry(v3)
     print("Ticket ID:", tid3)
     time.sleep(2)
-    amount3 = parking_lot.handle_exit(tid3)
-    print("Amount for ticket", tid3, "is", amount3)
 
+    v4 = VehicleClass("KA-01-AB-9022", "low", False, True, False)
+    tid4 = parking_lot.handle_entry(v4)
+    print("Ticket ID:", tid4)
+    time.sleep(2)
 
 
 
