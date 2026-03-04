@@ -3,10 +3,11 @@ import uuid
 from pricingStrategy.pricing_strategy import PricingStrategy
 class Ticket:
 
-    def __init__ ( self, ticket_id, entry_time, spot_id, vehicle_type, pricing_strategy : PricingStrategy):
+    def __init__ ( self, ticket_id, entry_time, spot_id, floor_id, vehicle_type, pricing_strategy : PricingStrategy):
         self.ticket_id = ticket_id
         self.entry_time = entry_time
         self.spot_assigned = spot_id
+        self.floor_assigned = floor_id
         self.vehicle_type = vehicle_type
         self.pricing_strategy = pricing_strategy
         self.exit_time = None
