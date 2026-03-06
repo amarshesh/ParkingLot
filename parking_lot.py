@@ -5,19 +5,15 @@ import threading
 from floors.floors import Floor
 from parkingStrategy.allocationStrategy import AllocationStrategy
 from parkingStrategy.parking_strategy import BestFitStrategy
+from parking_slots_status.status_space import DisplayBoard
 from paymentStrategy.paymentStrategy import PaymentFactory
 from pricingStrategy.pricing_factory import VehiclePricingFactory
-
 from spot_class import SpotClass
 from ticket_class import Ticket
 from vehicle_class import VehicleClass
-
 import pricingStrategy.vehicles_pricing
 import paymentStrategy.payment_options
-
-
 class ParkingLot:
-
     def __init__(self, allocation_strategy=None):
         self.tickets = {}
         self.floors = []
@@ -57,6 +53,17 @@ class ParkingLot:
 
         self.floors.extend([floor1, floor2, floor3, floor4, floor5])
 
+    def display_status(self):
+        medium = []
+        small = []
+        large = []
+
+        for floor in self.floors:
+            print(f"{floor.floor_id}:")
+            for spot in floor.spots:
+                status = "Occupied" if spot.current_vehicle else "Available"
+                print(f"  {spot.spot_id} ({spot.size}) - {status}")
+
 
     def handle_entry(self, vehicle: VehicleClass):
 
@@ -93,16 +100,15 @@ class ParkingLot:
                         f"{vehicle.vehicle_number} parked at "
                         f"{floor.floor_id}-{allocated_spot.spot_id}"
                     )
+                    DisplayBoard.show(self)
 
-                    return ticket_id
+                    return ticket
 
             print(f"No spot available for {vehicle.vehicle_number}")
             return None
 
     def handle_exit(self, ticket_id, payment_method="cash"):
-
         with self.lock:
-
             ticket = self.tickets.get(ticket_id)
 
             if not ticket:
@@ -132,78 +138,8 @@ class ParkingLot:
                         break
 
             del self.tickets[ticket_id]
+            DisplayBoard.show(self)
 
             print("Exit successful")
 
             return amount
-
-
-# ---------------- TEST ----------------
-
-def simulate_entry(parking_lot, vehicle):
-    tid = parking_lot.handle_entry(vehicle)
-    if tid:
-        print(f"{vehicle.vehicle_number} → ticket {tid}")
-    else:
-        print(f"{vehicle.vehicle_number} → no parking")
-
-
-if __name__ == "__main__":
-
-    parking_lot = ParkingLot()
-
-    vehicles = [
-        VehicleClass(f"KA-01-AB-{1000+i}", "small", False, False, False)
-        for i in range(20)
-    ]
-
-    threads = []
-
-    for v in vehicles:
-        t = threading.Thread(target=simulate_entry, args=(parking_lot, v))
-        threads.append(t)
-        t.start()
-
-    for t in threads:
-        t.join()
-
-    print("Simulation finished")
-
-
-       
-# if __name__ == "__main__":
-#     parking_lot = ParkingLot(BestFitStrategy())
-#     v1 = VehicleClass("KA-01-AB-1234", "small", False, True, False)
-#     tid1 = parking_lot.handle_entry(v1)
-#     print("Ticket ID:", tid1)
-#     time.sleep(2)
-#     amount = parking_lot.handle_exit(tid1, "credit_card")
-#     print("Amount:", amount)
-
-#     v2 = VehicleClass("KA-01-AB-5678", "medium", False, False, False)
-#     tid2 = parking_lot.handle_entry(v2)
-#     print("Ticket ID:", tid2)
-#     time.sleep(2)
-#     amount = parking_lot.handle_exit(tid2, "mobile")
-#     print("Amount:", amount)
-
-#     v3 = VehicleClass("KA-01-AB-9012", "large", False, False, False)
-#     tid3 = parking_lot.handle_entry(v3)
-#     print("Ticket ID:", tid3)
-#     time.sleep(2)
-#     amount = parking_lot.handle_exit(tid3,"cash")
-#     print("Amount:", amount)
-
-#     v4 = VehicleClass("KA-01-AB-9022", "low", False, False, False)
-#     tid4 = parking_lot.handle_entry(v4)
-#     print("Ticket ID:", tid4)
-#     time.sleep(2)
-#     amount = parking_lot.handle_exit(tid4, "mobile")
-#     print("Amount:", amount)
-
-#     v5 = VehicleClass("KA-01-AB-9999", "midlow", False, True, False)
-#     tid5 = parking_lot.handle_entry(v5)
-#     print("Ticket ID:", tid5)
-#     time.sleep(2)
-#     amount = parking_lot.handle_exit(tid5, "cash")
-#     print("Amount:", amount)                                                      
