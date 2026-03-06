@@ -1,6 +1,6 @@
 import uuid
 
-from pricingStrategy.pricing_strategy import PricingStrategy
+from strategies.pricing.pricing_strategy import PricingStrategy
 class Ticket:
 
     def __init__ ( self, ticket_id, entry_time, spot_id, floor_id, vehicle_type, pricing_strategy : PricingStrategy):

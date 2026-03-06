@@ -1,7 +1,7 @@
 
 
-from parking_lot import ParkingLot
-from vehicle_class import VehicleClass
+from core.parking_lot import ParkingLot
+from core.vehicle_class import VehicleClass
 
 
 class EntryGate:

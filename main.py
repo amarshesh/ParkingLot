@@ -1,6 +1,6 @@
 from gates.entry_gate import EntryGate
 from gates.exit_gate import ExitGate
-from parking_lot import ParkingLot
+from core.parking_lot import ParkingLot
 
 if __name__ == "__main__":
     parking_lot = ParkingLot()
