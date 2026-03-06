@@ -1,4 +1,5 @@
-from parkingStrategy.parking_strategy import NearestExitStrategy, BestFitStrategy
+from strategies.allocation.parking_strategy import NearestExitStrategy, BestFitStrategy
+
 class AllocationStrategy:
     @staticmethod
     def resolve(vehicle):

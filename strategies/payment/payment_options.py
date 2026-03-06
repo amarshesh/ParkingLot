@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 
-from paymentStrategy.paymentStrategy import PaymentFactory
+from strategies.payment.paymentStrategy import PaymentFactory
 class PaymentOptionStrategy(ABC):
     @abstractmethod
     def process_payment(self, amount):

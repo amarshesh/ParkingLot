@@ -1,6 +1,6 @@
 # ...existing code...
-from pricingStrategy.pricing_factory import VehiclePricingFactory
-from pricingStrategy.pricing_strategy import PricingStrategy
+from strategies.pricing.pricing_factory import VehiclePricingFactory
+from strategies.pricing.pricing_strategy import PricingStrategy
 
 class SmallPricing(PricingStrategy):
     def calculate_price(self, base_price):

@@ -3,21 +3,21 @@ import time
 import threading
 
 from floors.floors import Floor
-from parkingStrategy.allocationStrategy import AllocationStrategy
-from parkingStrategy.parking_strategy import BestFitStrategy
+from strategies.allocation.allocationStrategy import AllocationStrategy
 from parking_slots_status.status_space import DisplayBoard
-from paymentStrategy.paymentStrategy import PaymentFactory
-from pricingStrategy.pricing_factory import VehiclePricingFactory
-from spot_class import SpotClass
-from ticket_class import Ticket
-from vehicle_class import VehicleClass
-import pricingStrategy.vehicles_pricing
-import paymentStrategy.payment_options
+from strategies.allocation.parking_strategy import BestFitStrategy
+from strategies.payment.paymentStrategy import PaymentFactory
+from strategies.pricing.pricing_factory import VehiclePricingFactory
+from core.spot_class import SpotClass
+from core.ticket_class import Ticket
+from core.vehicle_class import VehicleClass
+import strategies.pricing.vehicles_pricing
+import strategies.payment.payment_options
 class ParkingLot:
     def __init__(self, allocation_strategy=None):
         self.tickets = {}
         self.floors = []
-        self.allocation_strategy = allocation_strategy or BestFitStrategy()
+        self.allocation_strategy = allocation_strategy or AllocationStrategy
         self.lock = threading.Lock()
 
         # -------- Floor 1 --------
@@ -54,10 +54,6 @@ class ParkingLot:
         self.floors.extend([floor1, floor2, floor3, floor4, floor5])
 
     def display_status(self):
-        medium = []
-        small = []
-        large = []
-
         for floor in self.floors:
             print(f"{floor.floor_id}:")
             for spot in floor.spots:
